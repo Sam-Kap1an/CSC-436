@@ -28,14 +28,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zybooks.pizzaparty.ui.PizzaPartyScreen
 import com.zybooks.pizzaparty.ui.theme.PizzaPartyTheme
 import kotlin.math.ceil
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
-            PizzaPartyTheme {
+            PizzaPartyTheme(dynamicColor = false) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -64,6 +67,9 @@ fun calculateNumPizzas(
 @Composable
 fun PizzaPartyScreen(modifier: Modifier = Modifier) {
     var totalPizzas by remember { mutableIntStateOf(0) }
+    var numPeopleInput by remember { mutableStateOf("") }
+    var hungerLevel by remember { mutableStateOf("Medium") }
+
 
     Column(
         modifier = modifier.padding(10.dp)
@@ -75,12 +81,15 @@ fun PizzaPartyScreen(modifier: Modifier = Modifier) {
         )
         NumberField(
             labelText = "Number of people?",
+            textInput = numPeopleInput,
+            onValueChange = { numPeopleInput = it },
             modifier = modifier.padding(bottom = 16.dp).fillMaxWidth()
         )
         RadioGroup(
             labelText = "How hungry?",
             radioOptions = listOf("Light", "Medium", "Ravenous"),
-            selectedValue = "Medium",
+            selectedOption = hungerLevel,
+            onSelected = { hungerLevel = it },
             modifier = modifier
         )
         Text(
@@ -90,8 +99,8 @@ fun PizzaPartyScreen(modifier: Modifier = Modifier) {
         )
         Button(
             onClick = {
-                // Not implemented yet
-            },
+                totalPizzas = calculateNumPizzas(numPeopleInput.toInt(), hungerLevel)
+                      },
             modifier = modifier.fillMaxWidth()
         ) {
             Text("Calculate")
@@ -102,13 +111,13 @@ fun PizzaPartyScreen(modifier: Modifier = Modifier) {
 @Composable
 fun NumberField(
     labelText: String,
+    textInput: String,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var textInput by remember { mutableStateOf("") }
-
     TextField(
         value = textInput,
-        onValueChange = { textInput = it },
+        onValueChange = onValueChange,
         label = { Text(labelText) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(
@@ -118,17 +127,15 @@ fun NumberField(
     )
 }
 
-
 @Composable
 fun RadioGroup(
     labelText: String,
     radioOptions: List<String>,
-    selectedValue: String,
+    selectedOption: String,
+    onSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var selectedOption by remember { mutableStateOf(selectedValue) }
     val isSelectedOption: (String) -> Boolean = { selectedOption == it }
-
     Column {
         Text(labelText)
         radioOptions.forEach { option ->
@@ -136,7 +143,7 @@ fun RadioGroup(
                 modifier = modifier
                     .selectable(
                         selected = isSelectedOption(option),
-                        onClick = { selectedOption = option },
+                        onClick = { onSelected(option) },
                         role = Role.RadioButton
                     )
                     .padding(8.dp)
