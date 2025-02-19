@@ -21,11 +21,13 @@ import com.zybooks.countdowntimer.ui.TimerScreen
 import com.zybooks.countdowntimer.ui.TimerViewModel
 import com.zybooks.countdowntimer.ui.theme.CountdownTimerTheme
 import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.app.ActivityCompat
+
+
 
 class MainActivity : ComponentActivity() {
    private val permissionRequestLauncher =
@@ -33,6 +35,7 @@ class MainActivity : ComponentActivity() {
          val message = if (isGranted) "Permission granted" else "Permission NOT granted"
          Log.i("MainActivity", message)
       }
+
 
    private val timerViewModel = TimerViewModel()
 
